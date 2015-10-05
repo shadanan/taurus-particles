@@ -24,7 +24,7 @@ class GameScene: SKScene {
         nodes.zPosition = 10
         
         self.physicsWorld.gravity = CGVectorMake(0, 0)
-        self.physicsWorld.speed = 1.0
+        self.physicsWorld.speed = 4.0
     }
     
     override func mouseDown(theEvent: NSEvent) {
@@ -38,6 +38,7 @@ class GameScene: SKScene {
         let physicsBody = SKPhysicsBody(circleOfRadius: 10)
         physicsBody.mass = 1
         physicsBody.dynamic = true
+        physicsBody.linearDamping = 0
         physicsBody.friction = 0
         physicsBody.restitution = 0
         physicsBody.allowsRotation = false
@@ -76,9 +77,11 @@ class GameScene: SKScene {
                 
                 let r = sqrtf(powf(dx, 2) + powf(dy, 2))
                 let r2 = sqrtf(powf(1024 - dx, 2) + powf(768 - dy, 2))
+                let r3 = sqrtf(powf(1024 - dx, 2) + powf(dy, 2))
+                let r4 = sqrtf(powf(dx, 2) + powf(768 - dy, 2))
                 let theta = atan2f(y2 - y1, x2 - x1)
                 
-                let f = (kp / powf(r2, 2)) - (kp / powf(r, 2))
+                let f = (kp / powf(r2, 2)) + (kp / powf(r3, 2)) + (kp / powf(r4, 2)) - (kp / powf(r, 2))
 
                 fx += f * cosf(theta)
                 fy += f * sinf(theta)
