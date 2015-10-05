@@ -11,6 +11,7 @@ import SpriteKit
 class GameScene: SKScene {
     var nodes = SKNode()
     var world = SKShapeNode(rect: CGRectMake(0, 0, 1024, 768))
+    var currentNode: SKNode?
     
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
@@ -29,23 +30,40 @@ class GameScene: SKScene {
     
     override func mouseDown(theEvent: NSEvent) {
         /* Called when a mouse click occurs */
-        let node = SKShapeNode(circleOfRadius: 10)
-
-        node.position = theEvent.locationInNode(nodes)
-        node.strokeColor = SKColor.blackColor()
-        node.fillColor = SKColor.redColor()
-        
-        let physicsBody = SKPhysicsBody(circleOfRadius: 10)
-        physicsBody.mass = 1
-        physicsBody.dynamic = true
-        physicsBody.linearDamping = 0
-        physicsBody.friction = 0
-        physicsBody.restitution = 0
-        physicsBody.allowsRotation = false
-        physicsBody.collisionBitMask = 1
-        node.physicsBody = physicsBody
-        
-        nodes.addChild(node)
+        let clickedNode = nodes.nodeAtPoint(theEvent.locationInNode(nodes))
+        if clickedNode != nodes {
+            currentNode = clickedNode
+            currentNode?.physicsBody?.dynamic = false
+        } else {
+            let node = SKShapeNode(circleOfRadius: 10)
+            
+            node.position = theEvent.locationInNode(nodes)
+            node.strokeColor = SKColor.blackColor()
+            node.fillColor = SKColor.redColor()
+            
+            let physicsBody = SKPhysicsBody(circleOfRadius: 10)
+            physicsBody.mass = 1
+            physicsBody.dynamic = true
+            physicsBody.linearDamping = 0.1
+            physicsBody.friction = 0
+            physicsBody.restitution = 0
+            physicsBody.allowsRotation = false
+            physicsBody.collisionBitMask = 1
+            node.physicsBody = physicsBody
+            
+            nodes.addChild(node)
+        }
+    }
+    
+    override func mouseDragged(theEvent: NSEvent) {
+        if let currentNode = self.currentNode {
+            currentNode.position = theEvent.locationInNode(nodes)
+        }
+    }
+    
+    override func mouseUp(theEvent: NSEvent) {
+        currentNode?.physicsBody?.dynamic = true
+        currentNode = nil
     }
     
     override func update(currentTime: CFTimeInterval) {
